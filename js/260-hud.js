@@ -26,20 +26,23 @@ function slotBox(x, y, label, name, color, cdFrac, cdText, locked, active, busy,
 
 function drawHUD() {
   const P = G.P, act = P.action, at = act ? act.type : null;
-  bar(16, 16, 250, 20, P.hp / P.maxHp, P.hp / P.maxHp > 0.3 ? "#d33" : "#f55");
-  txt(`HP ${Math.ceil(P.hp)} / ${P.maxHp}`, 141, 32, 14, "#fff");
-  bar(16, 42, 250, 12, P.xp / xpNeed(P.lvl), "#4e8");
-  if (G.xpPulse > 0) { ctx.fillStyle = `rgba(200,255,220,${0.5 * G.xpPulse})`; ctx.fillRect(16, 42, 250 * clamp(P.xp / xpNeed(P.lvl), 0, 1), 12); ctx.strokeStyle = `rgba(200,255,220,${0.8 * G.xpPulse})`; ctx.lineWidth = 2; ctx.strokeRect(15, 41, 252, 14); }
-  const passive = UPGRADES.find(u => u.damagePassive && P.up[u.id]);
-  if (passive) { drawIcon(passive.id, 16, 94, 22, passive.color); txt(passive.name + " Lv " + P.up[passive.id], 46, 111, 12, passive.color, "left"); }
   const hasB = hasBreath(), ready = hasB && P.charge >= BREATH.minStart;   // the charge meter itself is drawn bottom-centre by drawRampageHud (265)
-  txt(`LV ${P.lvl}`, 16, 94, 16, "#cfe", "left");
-  txtShadow(fmtTime(G.t), W / 2, 36, 28, "#fff");
-  if (G.nextBoss < BOSS_TIMES.length)
-    txt(`Next rival: ${BOSSES[G.nextBoss].name} at ${fmtTime(BOSS_TIMES[G.nextBoss])}`, W / 2, 56, 12, "rgba(255,255,255,.6)", "center", false);
-  txt(`Stomped: ${G.kills}`, W - 16, 32, 18, "#fff", "right");
-  txt(`Buildings flattened: ${G.destroyed}`, 16, 74, 14, "#fff", "left");
-  txt(muted ? "M: sound OFF" : "M: sound on", W - 16, 72, 11, "rgba(255,255,255,.4)", "right", false);
+  if (PLATFORM.touch) drawTouchHudTop(P);
+  else {
+    bar(16, 16, 250, 20, P.hp / P.maxHp, P.hp / P.maxHp > 0.3 ? "#d33" : "#f55");
+    txt(`HP ${Math.ceil(P.hp)} / ${P.maxHp}`, 141, 32, 14, "#fff");
+    bar(16, 42, 250, 12, P.xp / xpNeed(P.lvl), "#4e8");
+    if (G.xpPulse > 0) { ctx.fillStyle = `rgba(200,255,220,${0.5 * G.xpPulse})`; ctx.fillRect(16, 42, 250 * clamp(P.xp / xpNeed(P.lvl), 0, 1), 12); ctx.strokeStyle = `rgba(200,255,220,${0.8 * G.xpPulse})`; ctx.lineWidth = 2; ctx.strokeRect(15, 41, 252, 14); }
+    const passive = UPGRADES.find(u => u.damagePassive && P.up[u.id]);
+    if (passive) { drawIcon(passive.id, 16, 94, 22, passive.color); txt(passive.name + " Lv " + P.up[passive.id], 46, 111, 12, passive.color, "left"); }
+    txt(`LV ${P.lvl}`, 16, 94, 16, "#cfe", "left");
+    txtShadow(fmtTime(G.t), W / 2, 36, 28, "#fff");
+    if (G.nextBoss < BOSS_TIMES.length)
+      txt(`Next rival: ${BOSSES[G.nextBoss].name} at ${fmtTime(BOSS_TIMES[G.nextBoss])}`, W / 2, 56, 12, "rgba(255,255,255,.6)", "center", false);
+    txt(`Stomped: ${G.kills}`, W - 16, 32, 18, "#fff", "right");
+    txt(`Buildings flattened: ${G.destroyed}`, 16, 74, 14, "#fff", "left");
+    txt(muted ? "M: sound OFF" : "M: sound on", W - 16, 72, 11, "rgba(255,255,255,.4)", "right", false);
+  }
 
   // --- bottom-centre: LMB swipe, RMB breath, Q, E, SPACE
   const S = 62, gap = 10, total = 5 * S + 4 * gap, x0 = W / 2 - total / 2, y0 = H - S - 34, busy = !!act;
@@ -65,10 +68,10 @@ function drawHUD() {
   // boss bars
   const bs = bossesAlive();
   bs.forEach((b, i) => {
-    const y = 78 + i * 34;
-    bar(W / 2 - 220, y, 440, 16, b.hp / b.maxHp, b.inv ? "#999" : b.def.id === "omega" ? "#e43" : "#a4c", "rgba(0,0,0,.6)");
-    for (const f of b.def.phaseAt) { ctx.fillStyle = "#fff"; ctx.fillRect(W / 2 - 220 + 440 * f, y - 2, 2, 20); }   // phase markers
-    txt(b.def.name + `  (phase ${b.phase}/${b.def.phaseAt.length + 1})` + (b.tired ? "  TIRED!" : ""), W / 2, y + 30, 13, b.tired ? "#ffe27a" : "#fbd");
+    const tc = PLATFORM.touch, bw = tc ? 300 : 440, bh = tc ? 10 : 16, y = tc ? 62 + i * 28 : 78 + i * 34;
+    bar(W / 2 - bw / 2, y, bw, bh, b.hp / b.maxHp, b.inv ? "#999" : b.def.id === "omega" ? "#e43" : "#a4c", "rgba(0,0,0,.6)");
+    for (const f of b.def.phaseAt) { ctx.fillStyle = "#fff"; ctx.fillRect(W / 2 - bw / 2 + bw * f, y - 2, 2, bh + 4); }   // phase markers
+    txt(b.def.name + `  (phase ${b.phase}/${b.def.phaseAt.length + 1})` + (b.tired ? "  TIRED!" : ""), W / 2, y + bh + (tc ? 13 : 14), tc ? 11 : 13, b.tired ? "#ffe27a" : "#fbd");
   });
   // off-screen boss arrows
   for (const b of bs) {
@@ -84,11 +87,11 @@ function drawHUD() {
     const k = Math.min(1, G.introT / 0.4, (2.6 - G.introT) / 0.3 + 0.01);
     ctx.fillStyle = `rgba(120,0,0,${0.18 * k})`; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, 54 * k); ctx.fillRect(0, H - 54 * k, W, 54 * k);
-    ctx.globalAlpha = k; txtShadow("WARNING: " + G.introBoss.name, W / 2, H / 2 - 120, 44, "#ff6a5a");
-    txt(G.introBoss.sub, W / 2, H / 2 - 88, 18, "#fff", "center", false); ctx.globalAlpha = 1;
+    ctx.globalAlpha = k; txtShadow("WARNING: " + G.introBoss.name, W / 2, H / 2 - (PLATFORM.touch ? 70 : 120), PLATFORM.touch ? 30 : 44, "#ff6a5a");
+    txt(G.introBoss.sub, W / 2, H / 2 - (PLATFORM.touch ? 44 : 88), PLATFORM.touch ? 13 : 18, "#fff", "center", false); ctx.globalAlpha = 1;
   } else if (G.banner) {
     const a = Math.min(1, G.banner.t / 0.5, (G.banner.max - G.banner.t) / 0.2 + 0.2);
-    ctx.globalAlpha = clamp(a, 0, 1); txtShadow(G.banner.text, W / 2, H * 0.25, 40, "#ffd24a"); ctx.globalAlpha = 1;
+    ctx.globalAlpha = clamp(a, 0, 1); txtShadow(G.banner.text, W / 2, H * 0.25, PLATFORM.touch ? 28 : 40, "#ffd24a"); ctx.globalAlpha = 1;
   }
   if (G.hurtT > 0) { ctx.fillStyle = `rgba(255,0,0,${G.hurtT * 0.5})`; ctx.fillRect(0, 0, W, H); }
   if (state === "play") {                              // crosshair

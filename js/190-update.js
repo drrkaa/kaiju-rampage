@@ -229,7 +229,7 @@ function updatePlay(dt) {
   G.xpPulse = Math.max(0, G.xpPulse - dt * 3);
   G.nums = G.nums.filter(n => n.t > 0);
 
-  G.zoom += ((bossesAlive().length ? Math.min(BOSS_ZOOM, playerCameraZoom(P.lvl)) : playerCameraZoom(P.lvl)) - G.zoom) * Math.min(1, CAMERA.ease * dt);
+  G.zoom += ((bossesAlive().length ? Math.min(BOSS_ZOOM, playerCameraZoom(P.lvl)) : playerCameraZoom(P.lvl)) * platformZoomMul() - G.zoom) * Math.min(1, CAMERA.ease * dt);
   // camera leads slightly toward where we are facing
   const tx = P.x + Math.cos(P.face) * MOVE.camLead, ty = P.y + Math.sin(P.face) * MOVE.camLead;
   G.cam.x += (tx - G.cam.x) * Math.min(1, 8 * dt);

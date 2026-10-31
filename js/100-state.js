@@ -18,7 +18,7 @@ function newGame() {
     spawnAcc: 0, nextWave: SPAWN.waveEvery, nextBoss: 0, introT: 0, introBoss: null,
     xpTotal: 0, bldgXp: 0,
     enemies: [], xpLabels: [], xpPulse: 0, projs: [], parts: [], rings: [], hazards: [], swipes: [],
-    zoom: CAMERA.startZoom, waves: [], stompWaves: [], crescents: [], dmgList: [], smoke: [], decals: [], flares: [], nums: [],
+    zoom: CAMERA.startZoom * platformZoomMul(), waves: [], stompWaves: [], crescents: [], dmgList: [], smoke: [], decals: [], flares: [], nums: [],
     banner: null, cam: { x: 0, y: 0 }, choices: [], hurtT: 0, iframe: 0, endT: 0,
     aim: { x: 100, y: 0 },
     P: {

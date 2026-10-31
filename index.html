@@ -22,6 +22,11 @@
   #guide figcaption { padding:12px; font-size:14px; }
   #guide .controls { padding:14px 0; color:#c3d8d1; }
   #guide button { display:block; width:100%; padding:14px; border:0; border-radius:9px; background:#9affb1; color:#11291b; font:bold 18px 'Trebuchet MS',sans-serif; cursor:pointer; }
+  #guide .touch-help { display:none; }
+  @media(pointer:coarse) { #guide .desk-help { display:none; } #guide .touch-help { display:block; } }
+  @media(max-height:520px) { #guide { padding:12px 18px; max-height:96dvh; border-radius:14px; font-size:13px; line-height:1.35; }
+    #guide .shots, #guide .eyebrow { display:none; } #guide h1 { font-size:22px; } #guide p { margin:6px 0; }
+    #guide .controls { padding:4px 0 8px; } #guide button { padding:10px; font-size:16px; } }
   @media(max-width:550px) { #guide .shots { gap:10px; } #guide figcaption { padding:8px; font-size:12px; } }
 </style>
 </head>
@@ -35,7 +40,7 @@
     <figure><img src="assets/guide-city.jpg" alt="Your kaiju roaming the city and smashing buildings"><figcaption><b>Make room to grow.</b> Claws clear nearby enemies; hold Atomic Breath to burn through buildings. Charge refills over time.</figcaption></figure>
     <figure><img src="assets/guide-boss.jpg" alt="A rival kaiju and its red attack warning"><figcaption><b>Read the warning.</b> Leave red attack zones, evade with Space, then strike while the boss rests.</figcaption></figure>
   </div>
-  <p class="controls">WASD move · Mouse aim · Left click claws · Hold right click breath · Space evade · Q / E chosen abilities · Esc pause · M sound<br>On touch screens: left stick moves, right stick aims, and the action buttons attack.</p>
+  <p class="controls"><span class="desk-help">WASD move · Mouse aim · Left click claws · Hold right click breath · Space evade · Q / E chosen abilities · Esc pause · M sound</span><span class="touch-help">Left stick moves, right stick aims, and the buttons attack: claws, breath and your abilities. Turn your phone sideways.</span></p>
   <button id="guide-start" type="button">Got it — let’s rampage</button>
 </dialog>
 <!-- Tunable constants (config files first: everything below reads them) -->

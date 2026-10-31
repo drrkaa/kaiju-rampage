@@ -34,6 +34,8 @@ const TOUCH_CFG = {
   cardDelayFrames: 18,   // frames after the level-up screen opens before a tap can pick a card (no accidental picks)
   maxDpr: 2,             // cap of devicePixelRatio for the canvas backing store on touch devices
   maxBackingW: 1600,     // cap of the backing store width in device px on touch devices (performance)
+  hudScale: 0.7,         // touch HUD size relative to the UI scale (the HUD was far too large on phones)
+  zoomMul: 0.85,         // touch camera zoom multiplier (< 1 = zoomed out a little, so more of the city is visible)
   tryFullscreen: true,   // ask for fullscreen + landscape lock on the first start tap (best effort, ignored when refused)
 };
 const PLATFORM = { touch: false, auto: false, uiScale: 1 };
@@ -45,6 +47,8 @@ const PLATFORM = { touch: false, auto: false, uiScale: 1 };
 })();
 // HUD / button scale for the current window (1 on desktop).
 function platformUiScale() { return PLATFORM.touch ? Math.min(TOUCH_CFG.uiMaxScale, Math.max(1, TOUCH_CFG.uiRefH / Math.max(1, window.innerHeight))) : 1; }
+// Camera zoom multiplier for the current platform (1 on desktop).
+function platformZoomMul() { return PLATFORM.touch ? TOUCH_CFG.zoomMul : 1; }
 // Canvas backing-store pixel ratio: devicePixelRatio on desktop (unchanged), capped on touch devices.
 function platformPixelRatio() {
   const dpr = window.devicePixelRatio || 1;

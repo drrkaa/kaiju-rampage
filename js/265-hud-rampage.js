@@ -70,7 +70,7 @@ function drawChargeBar() {
 }
 // Timeline strip under the timer: marks at each boss time, the final boss marked red, the player's position as a pointer.
 function drawBossTimeline() {
-  const T = BOSS_TIMES, end = T[T.length - 1] * 1.04, w = TEASE.timelineW, x = W / 2 - w / 2, y = 70, px = t => x + w * clamp(t / end, 0, 1);
+  const T = BOSS_TIMES, end = T[T.length - 1] * 1.04, w = PLATFORM.touch ? Math.min(TEASE.timelineW, 240) : TEASE.timelineW, x = W / 2 - w / 2, y = PLATFORM.touch ? 52 : 70, px = t => x + w * clamp(t / end, 0, 1);
   ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(x - 6, y - 5, w + 12, 10);
   ctx.fillStyle = "rgba(255,255,255,.12)"; ctx.fillRect(x, y - 1.5, w, 3);
   ctx.fillStyle = "rgba(255,200,90,.85)"; ctx.fillRect(x, y - 1.5, px(G.t) - x, 3);                     // progress so far
@@ -86,13 +86,13 @@ function drawBossTimeline() {
   ctx.beginPath(); ctx.moveTo(mx, y - 3); ctx.lineTo(mx + 5, y - 11); ctx.lineTo(mx - 5, y - 11); ctx.closePath(); ctx.fill(); ctx.stroke();
 }
 function drawRampageHud() {
-  drawChargeBar();
+  if (!PLATFORM.touch) drawChargeBar();            // touch: a small charge bar sits top-left (drawTouchHudTop)
   drawBossTimeline();
   const om = BOSSES[BOSSES.length - 1];
   if (G.tease > 0) {                                                                                      // run-start tease, under the RAMPAGE! banner
     const a = clamp(Math.min(G.tease / 0.8, (TEASE.runBanner - G.tease) / 0.6), 0, 1);
-    ctx.globalAlpha = a; txtShadow(`${om.name} awaits at ${fmtTime(BOSS_TIMES[BOSS_TIMES.length - 1])}`, W / 2, H * 0.25 + 44, 24, "#ff6a5a");
-    txt("Survive. Grow. Defeat it.", W / 2, H * 0.25 + 68, 15, "#fff", "center", false); ctx.globalAlpha = 1;
+    ctx.globalAlpha = a; txtShadow(`${om.name} awaits at ${fmtTime(BOSS_TIMES[BOSS_TIMES.length - 1])}`, W / 2, H * 0.25 + (PLATFORM.touch ? 28 : 44), PLATFORM.touch ? 16 : 24, "#ff6a5a");
+    txt("Survive. Grow. Defeat it.", W / 2, H * 0.25 + (PLATFORM.touch ? 46 : 68), PLATFORM.touch ? 11 : 15, "#fff", "center", false); ctx.globalAlpha = 1;
   }
   const sb = G.slBanner;
   if (sb) {
@@ -114,4 +114,28 @@ function drawTitleTease() {
   }
   drawKaiju(x, y, -0.65, scale, PLAYER_PAL, titleT * 1.5, false, 0.6, {});
   ctx.restore();
+}
+
+// ---- Phone HUD (touch only): small bars in the top-left corner, no kill/building counters ----
+function drawCompactCharge(x, y, w, h) {
+  const P = G.P, laser = P.slots.some(id => id === "superlaser" || id === "mega");
+  const spec = heavyChargeSpec(P.slots.includes("superlaser") ? "superlaser" : "mega"), c = clamp(P.charge, 0, 100) / 100;
+  const ready = hasBreath() && P.charge >= BREATH.minStart, lready = laser && P.charge >= spec.minCharge;
+  ctx.fillStyle = "rgba(0,0,0,.65)"; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+  ctx.fillStyle = P.failT > 0 ? "#f44" : lready ? "#ffd98a" : ready ? "#5cf" : "#c83"; ctx.fillRect(x, y, w * c, h);
+  ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillRect(x + w * BREATH.minStart / 100 - 0.5, y - 1, 1, h + 2);
+  if (laser) { ctx.fillStyle = "#ffcf5a"; ctx.fillRect(x + w * spec.minCharge / 100 - 0.5, y - 2, 1.5, h + 4); }
+  txt("CHARGE", x + w + 5, y + h, 8, "rgba(255,255,255,.7)", "left", false);
+}
+function drawTouchHudTop(P) {
+  const hf = P.hp / P.maxHp, xf = clamp(P.xp / xpNeed(P.lvl), 0, 1);
+  bar(10, 8, 120, 12, hf, hf > 0.3 ? "#d33" : "#f55");
+  txt(`${Math.ceil(P.hp)}/${P.maxHp}`, 70, 18, 10, "#fff");
+  bar(10, 23, 120, 6, xf, "#4e8");
+  if (G.xpPulse > 0) { ctx.fillStyle = `rgba(200,255,220,${0.5 * G.xpPulse})`; ctx.fillRect(10, 23, 120 * xf, 6); }
+  txt(`LV ${P.lvl}`, 136, 29, 11, "#cfe", "left");
+  drawCompactCharge(10, 34, 80, 5);
+  const passive = UPGRADES.find(u => u.damagePassive && P.up[u.id]);
+  if (passive) { drawIcon(passive.id, 10, 44, 14, passive.color); txt(passive.name + " Lv " + P.up[passive.id], 28, 55, 10, passive.color, "left"); }
+  txtShadow(fmtTime(G.t), W / 2, 24, 20, "#fff");
 }

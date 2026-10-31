@@ -45,9 +45,10 @@ function wrapText(s, x, y, maxW, lh) {
 function drawTitle() {
   ctx.fillStyle = "#0d171c"; ctx.fillRect(0, 0, W, H);
   drawTitleTease();                                // the Omega Tyrant looms in the background (265)
-  txtShadow(GAME_TITLE, W / 2, H * 0.22, Math.min(80, W / 9), "#7dff8a");
+  txtShadow(GAME_TITLE, W / 2, H * 0.22, Math.min(80, W / (PLATFORM.touch ? 11 : 9)), "#7dff8a");
   txt("Devour the city. Grow strong. Crush your greatest rival.", W / 2, H * 0.36, Math.min(19, W / 38), "#ddd");
   txt("Claws • Atomic Breath • Upgrades • Space to evade", W / 2, H * 0.36 + 30, Math.min(16, W / 40), "#9cbaac");
+  if (PLATFORM.touch) return;                      // touch: "TAP to rampage" is drawn by the touch overlay (275)
   const pulse = 0.6 + 0.4 * Math.sin(titleT * 4);
   ctx.globalAlpha = pulse; txt("Click or press ENTER to rampage", W / 2, H * 0.9, 26, "#fff"); ctx.globalAlpha = 1;
 }

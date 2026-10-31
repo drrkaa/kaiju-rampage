@@ -8,7 +8,7 @@ function requestRampage() {
     const button = document.getElementById("guide-start");
     button.onclick = () => { dialog.close(); audioInit(); startGame(); };
     dialog.oncancel = () => { resetInput(); };
-    button.focus();
+    button.focus({ preventScroll: true });
     return;
   }
   startGame();

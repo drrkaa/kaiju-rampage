@@ -55,7 +55,7 @@ function drawPlatformOverlay() {
 // Runs a draw function (the HUD) scaled up by the UI scale on small touch screens. W/H are temporarily the scaled-down
 // logical size so the function lays itself out unchanged; the crosshair position is scaled the same way.
 function drawScaled(fn) {
-  const s = PLATFORM.uiScale;
+  const s = PLATFORM.uiScale * (PLATFORM.touch ? TOUCH_CFG.hudScale : 1);   // phones draw the HUD smaller
   if (s === 1) return fn();
   const w0 = W, h0 = H, mx = mouse.x, my = mouse.y;
   ctx.save(); ctx.scale(s, s); W = w0 / s; H = h0 / s; mouse.x = mx / s; mouse.y = my / s;
